@@ -19,3 +19,45 @@ db_host = os.getenv("SQL_SERVER_HOST", "localhost")
 db_port = os.getenv("SQL_SERVER_PORT", "1433")
 db_user = os.getenv("SQL_ADMIN_USER")
 db_password = os.getenv("SQL_ADMIN_PASSWORD")
+
+# 1. load the raw dataset from CSV file
+df = pd.read_csv(data_path)
+
+#2. mapping clean columns to a messy 2000s legacy enterprise schema
+legacy_mapping = {
+    'timestamp': 'TS_UTC',
+    'vehicle_gps_latitude': 'V_LAT',
+    'vehicle_gps_longitude': 'V_LON',
+    'iot_temperature': 'IOT_TEMP_VAL_C',
+    'cargo_condition_status': 'CGO_COND_CD',
+    'risk_classification': 'RISK_CLS_TXT',
+    'delay_probability': 'DELAY_PROB_DEC',
+    'port_congestion_level': 'PRT_CNG_LVL',
+    'route_risk_level': 'RT_RSK_IDX'
+}
+
+# note** we have created weird column names just to show how the legacy system might have designed.
+# note** u can find the actual column names in the dataset
+
+#3. Keep only the columns we mapped for this demo and rename them
+df_legacy = df[list(legacy_mapping.keys())].rename(columns=legacy_mapping)
+
+#4. Add a fake ingestion flag to make it look like an automated legacy system
+df_legacy['SYS_INGEST_FLAG'] = 'Y'
+# it tells that these are the columns that have been ingested
+
+#5. Connect to the Docker MSSQL Server
+print("Connecting to legacy MSSQL Database...")
+
+# Use the pyodbc driver. (Ensure you have ODBC Driver 17 or 18 for SQL Server installed on your OS)
+conection_string = (
+    f"DRIVER={{ODBC Driver 18 for SQL Server}};"
+    f"SERVER={db_host},{db_port};"
+    f"DATABASE=master;"
+    f"UID={db_user};"
+    f"PWD={db_password};"
+    f"Encrypt=no;"
+    f"TrustServerCertificate=yes;"
+)
+
+params = urllib.parse.qoute_plus(conection_string)
