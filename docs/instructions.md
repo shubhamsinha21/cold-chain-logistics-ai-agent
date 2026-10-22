@@ -19,4 +19,7 @@ docker run -v mssql_data:/var/opt/mssql \
 -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
-docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=FdeEnterprisePass123!" -p 1433:1433 --name legacy-mssql -d mcr.microsoft.com/mssql/server:2022-latest
+- After this, we will install the requirements.
+```
+python -m pip install -r requirements.txt
+```
