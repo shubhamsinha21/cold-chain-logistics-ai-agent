@@ -64,3 +64,21 @@ Command to test ->
 SELECT COUNT(*) AS total_rows FROM dbo.TBL_SC_FLEET_HIST_RAW;
 ```
 
+# instruction for Ec2 instance > datbase
+
+- Instance type : c7i-flex.large
+- storage : 30 gb
+- mac os
+- Security group > attach the security while creating ec2 instance
+- Launch instance
+- SSH using .pem file from your system
+- install the docker
+
+```
+docker run -v mssql_data:/var/opt/mssql \
+  -e "ACCEPT_EULA=Y" \
+  -e "MSSQL_SA_PASSWORD=FdeEnterprisePass123!" \
+  -p 1433:1433 \
+  --name legacy-mssql \
+  -d mcr.microsoft.com/mssql/server:2022-latest
+```
